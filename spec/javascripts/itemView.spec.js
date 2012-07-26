@@ -409,4 +409,42 @@ describe("item view", function(){
 
   });
 
+  describe("templates that have data-bind attributes in them", function() {
+
+    var View = Backbone.Marionette.ItemView.extend({
+      template: "#boundItemTemplate",
+      ui: {
+        foo : "#foo"
+      }
+    });
+
+    var view, chk, model;
+
+    beforeEach(function() {
+      loadFixtures("boundItemTemplate.html");
+
+      model = new Backbone.Model({
+        foo : 'bar'
+      });
+
+      view = new View({
+        model: model
+      });
+
+      view.render();
+    });
+
+
+    it("should automatically populate html fields", function(){
+      expect(view.ui.foo.html()).toEqual(model.get('foo'));
+    });
+
+    it("should update html upon model change", function() {
+      model.set('foo','newValue');
+      expect(view.ui.foo.html()).toEqual('newValue');
+    });
+
+  });
+
+
 });
