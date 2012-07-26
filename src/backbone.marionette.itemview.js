@@ -5,6 +5,8 @@
 // with underscore.js templates, serializing the view's model or collection,
 // and calling several methods on extended views, such as `onRender`.
 Marionette.ItemView =  Marionette.View.extend({
+  _boundElements : [],
+
   constructor: function(){
     Marionette.View.prototype.constructor.apply(this, arguments);
     this.initialEvents();
@@ -32,7 +34,9 @@ Marionette.ItemView =  Marionette.View.extend({
     var data = this.serializeData();
     var template = this.getTemplate();
     var html = Marionette.Renderer.render(template, data);
+    this.unbindElements();
     this.$el.html(html);
+    this.bindElements();
     this.bindUIElements();
 
     if (this.onRender){ this.onRender(); }
@@ -47,5 +51,31 @@ Marionette.ItemView =  Marionette.View.extend({
     this.trigger('item:before:close');
     Marionette.View.prototype.close.apply(this, arguments);
     this.trigger('item:closed');
+  },
+
+  // Bind simple model properties to html elements in the template
+  bindElements : function() {
+    var that = this,
+        model = this.model;
+
+    this.$el.find('[data-bind]').each(function(i, el) {
+      el = $(el);
+      var boundProperty = el.data('bind');
+
+      function updateElement() { el.html(model.get(boundProperty)); }
+
+      if (model.has(boundProperty)) {
+        updateElement();
+        that._boundElements.push(that.bindTo(model, 'change:' + boundProperty, updateElement, that));
+      }
+    });
+  },
+
+  unbindElements : function() {
+    var that = this;
+
+    _(this._boundElements).each(function(val){
+      that.unbindFrom(val);
+    });
   }
 });
