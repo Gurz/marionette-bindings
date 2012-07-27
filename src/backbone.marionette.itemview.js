@@ -5,7 +5,7 @@
 // with underscore.js templates, serializing the view's model or collection,
 // and calling several methods on extended views, such as `onRender`.
 Marionette.ItemView =  Marionette.View.extend({
-  _boundElements : [],
+  _boundElements : null,
 
   constructor: function(){
     Marionette.View.prototype.constructor.apply(this, arguments);
@@ -58,11 +58,12 @@ Marionette.ItemView =  Marionette.View.extend({
     var that = this,
         model = this.model;
 
-    this.$el.find('[data-bind]').each(function(i, el) {
-      el = $(el);
-      var boundProperty = el.data('bind');
+    that._boundElements = that._boundElements || [];
 
-      function updateElement() { el.html(model.get(boundProperty)); }
+    this.$el.find('[data-bind]').each(function(i, el) {
+      var $el = $(el), boundProperty = $el.data('bind');
+
+      function updateElement() { $el.html(model.get(boundProperty)); }
 
       if (model.has(boundProperty)) {
         updateElement();
