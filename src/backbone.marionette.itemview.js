@@ -34,9 +34,9 @@ Marionette.ItemView =  Marionette.View.extend({
     var data = this.serializeData();
     var template = this.getTemplate();
     var html = Marionette.Renderer.render(template, data);
-    this.unbindElements();
+    this.preTemplateRender();
     this.$el.html(html);
-    this.bindElements();
+    this.postTemplateRender();
     this.bindUIElements();
 
     if (this.onRender){ this.onRender(); }
@@ -54,7 +54,7 @@ Marionette.ItemView =  Marionette.View.extend({
   },
 
   // Bind simple model properties to html elements in the template
-  bindElements : function() {
+  postTemplateRender : function() {
     var that = this,
         model = this.model;
 
@@ -71,7 +71,7 @@ Marionette.ItemView =  Marionette.View.extend({
     });
   },
 
-  unbindElements : function() {
+  preTemplateRender : function() {
     var that = this;
 
     _(this._boundElements).each(function(val){
