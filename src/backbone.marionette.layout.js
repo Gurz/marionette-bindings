@@ -78,6 +78,23 @@ Marionette.Layout = Marionette.ItemView.extend({
 
   },
 
+  postTemplateRender : function() {
+    Marionette.ItemView.prototype.postTemplateRender.apply(this, arguments);
+    var that = this;
+    this.$el.find('[data-region]').each(function(index,el) {
+      var $el = $(el), name = el.id || $el.data('region');
+
+      if (name) {
+        var regionManager = new that.regionType({
+          el : el,
+          getEl : function(){ return $el }
+        });
+        that.regionManagers[name] = regionManager;
+        that[name] = regionManager;
+      }
+    });
+  },
+
   // Re-initialize all of the regions by updating the `el` that
   // they point to
   reInitializeRegions: function(){
